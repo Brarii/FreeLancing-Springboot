@@ -1,0 +1,60 @@
+package com.example.newproj.controller;
+
+import com.example.newproj.Entities.appuser;
+import com.example.newproj.config.jwtservice;
+import com.example.newproj.repositories.AppUserRepository;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.DoubleStream;
+
+@Builder
+@Service
+@AllArgsConstructor
+public class authservice {
+    private final AppUserRepository ar;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+
+    private final jwtservice jwtservice;
+
+ /*   public AuthnticationResponse register
+            (RegisterRequest registerRequest) {
+
+        var user = appuser.builder()
+                .username(registerRequest.getUsername())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+
+                .build();
+        appuserrepo.save(user);
+        var jwttoken = jwtservice.generatetoken
+                ( user);
+
+
+        return AuthnticationResponse.builder()
+                .token(jwttoken)
+                .build();
+    }*/
+
+    public AuthnticationResponse authenticate(AuthenticationRequest authenticationRequest)
+    {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken
+                        (authenticationRequest.getEmail(),
+                                authenticationRequest.getPassword())
+        );
+        var user = ar.findByUsername(authenticationRequest.getEmail());
+        var jwttoken = jwtservice.generatetoken
+                ( user);
+
+
+        return AuthnticationResponse.builder()
+                .token(jwttoken)
+                .build();
+    }
+}
